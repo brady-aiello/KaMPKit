@@ -8,7 +8,7 @@
 
 import Combine
 import KMPNativeCoroutinesCombine
-import UIKit
+import SwiftUI
 import shared
 
 class BreedsViewController: UIViewController {
@@ -19,12 +19,7 @@ class BreedsViewController: UIViewController {
     let log = koin.get(objCClass: Kermit.self, parameter: "ViewController") as! Kermit
     private let refreshControl = UIRefreshControl()
 
-    lazy var adapter: NativeViewModel = NativeViewModel(
-        onLoading: { /* Loading spinner is shown automatically on iOS */},
-        onSuccess: { _ in },
-        onError: { _ in },
-        onEmpty: { /* Show "No doggos found!" message */        }
-    )
+    lazy var adapter: NativeViewModel = NativeViewModel()
     
     var cancellable: AnyCancellable?
     
@@ -77,6 +72,7 @@ class BreedsViewController: UIViewController {
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
+        cancellable?.cancel()
         adapter.onDestroy()
     }
     
@@ -121,18 +117,29 @@ extension BreedsViewController: BreedCellDelegate {
     }
 }
 
-enum DataStateNative<T> {
+indirect enum DataStateNative<T> {
     case Success(_ data: T)
     case Error(_ error: String)
     case Empty
-    case Loading
+    case Loading(_ lastDataState: DataStateNative<T>? = nil)
 }
 
 class ObservableDataState: ObservableObject {
-    @Published var dataStateNative: DataStateNative<ItemDataSummary>
+    @Published var dataStateNative: DataStateNative<ItemDataSummary> = DataStateNative.Loading()
+    var cancellable: AnyCancellable?
     
-    init(dataStateNative: DataStateNative<ItemDataSummary>) {
-        self.dataStateNative = dataStateNative
+    init(_ nativeViewModel: NativeViewModel) {
+        cancellable = createPublisher(for: nativeViewModel.breedsNativeFlow)
+            .receive(on: DispatchQueue.main)
+            .sink(
+                receiveCompletion: { completion in
+                    print("Received Completion \(completion)")
+                },
+                receiveValue: { [weak self] value in
+                    let dataState: DataStateNative<ItemDataSummary> = toDataStateNative(value)
+                    self?.dataStateNative = dataState
+                }
+            )
     }
 }
 
@@ -144,10 +151,24 @@ func toDataStateNative<T>(_ dataState: DataState<T>) -> DataStateNative<T> {
         return DataStateNative.Error(error.exception)
     case is DataStateEmpty:
         return DataStateNative.Empty
-    case is DataStateLoading:
-        return DataStateNative.Loading
+    case let loading as DataStateLoading<T>:
+        return DataStateNative.Loading(toDataStateNativeNullable(loading.lastDataState ?? nil))
     default:
         return DataStateNative.Empty
     }
-    
+}
+
+func toDataStateNativeNullable<T>(_ dataState: DataState<T>?) -> DataStateNative<T> {
+    switch dataState {
+    case let success as DataStateSuccess<T>:
+        return DataStateNative.Success(success.data!)
+    case let error as DataStateError:
+        return DataStateNative.Error(error.exception)
+    case is DataStateEmpty:
+        return DataStateNative.Empty
+    case let loading as DataStateLoading<T>:
+        return DataStateNative.Loading(toDataStateNativeNullable(loading.lastDataState ?? nil))
+    default:
+        return DataStateNative.Empty
+    }
 }

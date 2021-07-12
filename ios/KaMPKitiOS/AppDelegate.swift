@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import SwiftUI
 import shared
 
 @UIApplicationMain
@@ -23,11 +24,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         startKoin()
               
         // Manually launch storyboard so that ViewController doesn't initialize before Koin
-        let storyboard = UIStoryboard(name: "Main", bundle: nil)
-        let viewController = storyboard.instantiateViewController(identifier: "BreedsViewController")
+        // let storyboard = UIStoryboard(name: "Main", bundle: nil)
+        //let viewController = storyboard.instantiateViewController(identifier: //"BreedsViewController")
         
         self.window = UIWindow(frame: UIScreen.main.bounds)
-        self.window?.rootViewController = viewController
+//        self.window?.rootViewController = viewController
+        self.window?.rootViewController = UIHostingController(rootView: BreedListView(NativeViewModel()))
+
         self.window?.makeKeyAndVisible()
         
         log.v(withMessage: {"App Started"})

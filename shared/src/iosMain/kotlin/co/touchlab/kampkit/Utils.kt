@@ -7,3 +7,6 @@ import com.rickclephas.kmp.nativecoroutines.asNativeFlow
 
 val NativeViewModel.breedsNativeFlow: NativeFlow<DataState<ItemDataSummary>>
     get() = breedStateFlow.asNativeFlow()
+
+val NativeViewModel.isRefreshingNativeFLow: NativeFlow<Boolean>
+    get() = isRefreshing.asNativeFlow()
