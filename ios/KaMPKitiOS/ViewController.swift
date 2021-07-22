@@ -126,6 +126,9 @@ indirect enum DataStateNative<T> {
 
 class ObservableDataState: ObservableObject {
     @Published var dataStateNative: DataStateNative<ItemDataSummary> = DataStateNative.Loading()
+    
+    @Published var isLoading: Bool = true
+    
     var cancellable: AnyCancellable?
     
     init(_ nativeViewModel: NativeViewModel) {
@@ -138,6 +141,11 @@ class ObservableDataState: ObservableObject {
                 receiveValue: { [weak self] value in
                     let dataState: DataStateNative<ItemDataSummary> = toDataStateNative(value)
                     self?.dataStateNative = dataState
+                    if case .Loading = dataState {
+                        self?.isLoading = true
+                    } else {
+                        self?.isLoading = false
+                    }
                 }
             )
     }

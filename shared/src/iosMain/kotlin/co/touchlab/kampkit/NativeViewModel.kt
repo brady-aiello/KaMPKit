@@ -24,14 +24,10 @@ class NativeViewModel : KoinComponent {
     private val scope = MainScope(Dispatchers.Main, log)
     val breedModel: BreedModel = BreedModel()
     private val _breedStateFlow: MutableStateFlow<DataState<ItemDataSummary>> = MutableStateFlow(
-        DataState.Success(ItemDataSummary(null, listOf()))
+        DataState.Loading<ItemDataSummary>()
     )
     val breedStateFlow: StateFlow<DataState<ItemDataSummary>>
         get() = _breedStateFlow
-
-    private val _isRefreshing: MutableStateFlow<Boolean> = MutableStateFlow(false)
-    val isRefreshing: StateFlow<Boolean>
-        get() = _isRefreshing
 
     init {
         ensureNeverFrozen()
@@ -65,7 +61,8 @@ class NativeViewModel : KoinComponent {
                     _breedStateFlow.value = newLoadingState
                 } else {
                     _breedStateFlow.value = dataState
-                }            }
+                }
+            }
         }
     }
 

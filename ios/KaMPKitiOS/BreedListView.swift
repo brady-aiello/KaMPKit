@@ -9,6 +9,7 @@
 import Combine
 import KMPNativeCoroutinesCombine
 import SwiftUI
+import SwiftUIRefresh
 import shared
 
 
@@ -57,22 +58,45 @@ struct BreedListView: View {
     }
                     
     func EmptyView() -> AnyView {
-        return AnyView(Text("No doggos! 🥺"))
+        return AnyView(
+            ScrollView {
+                Text("No doggos! 🥺")
+                    .scaledToFill()
+                List {
+                    
+                }.scaledToFill()
+            }
+        )
     }
     
     func ErrorView(_ error: String) -> AnyView {
-        return AnyView(Text("Error: \(error)"))
+        
+        return AnyView(
+            VStack {
+                Text("Error: \(error)")
+                    .scaledToFill()
+                List {
+                    
+                }
+                .scaledToFill()
+                .pullToRefresh(isShowing: $observableDataState.isLoading) {
+                    nativeViewModel.refreshBreeds(forced: true)
+                }
+            }
+        )
     }
     
     func SuccessView(_ data: ItemDataSummary)  -> AnyView {
-        return AnyView(List {
-            ForEach(data.allItems, id: \.self) { item in
-                BreedRowView(item, nativeViewModel.updateBreedFavorite)
+        return AnyView(
+            List {
+                ForEach(data.allItems, id: \.self) { item in
+                    BreedRowView(item, nativeViewModel.updateBreedFavorite)
+                }
             }
-        }
-        .refreshable {
-            nativeViewModel.refreshBreeds(forced: true)
-        })
+            .pullToRefresh(isShowing: $observableDataState.isLoading) {
+                nativeViewModel.refreshBreeds(forced: true)
+            }
+        )
     }
     
 }

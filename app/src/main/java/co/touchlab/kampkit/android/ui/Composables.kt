@@ -131,7 +131,6 @@ fun MainScreen(
     dataState: DataState<ItemDataSummary>,
     favoriteBreed: (Breed) -> Unit
 ) {
-    //val lastState: MutableState<DataState<ItemDataSummary>> = remember { mutableStateOf(dataState) }
     when (dataState) {
         is DataState.Loading -> {
             Loading(dataState.lastDataState, favoriteBreed = favoriteBreed)

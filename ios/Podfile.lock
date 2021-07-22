@@ -1,27 +1,35 @@
 PODS:
+  - Introspect (0.1.3)
   - KMPNativeCoroutinesCombine (0.2.0):
     - KMPNativeCoroutinesCore
   - KMPNativeCoroutinesCore (0.2.0)
   - shared (1.1)
+  - SwiftUIRefresh (0.0.3):
+    - Introspect (~> 0.1.0)
 
 DEPENDENCIES:
   - KMPNativeCoroutinesCombine (~> 0.2)
   - shared (from `../shared/`)
+  - SwiftUIRefresh
 
 SPEC REPOS:
   trunk:
+    - Introspect
     - KMPNativeCoroutinesCombine
     - KMPNativeCoroutinesCore
+    - SwiftUIRefresh
 
 EXTERNAL SOURCES:
   shared:
     :path: "../shared/"
 
 SPEC CHECKSUMS:
+  Introspect: 2be020f30f084ada52bb4387fff83fa52c5c400e
   KMPNativeCoroutinesCombine: 85a52598bfd40d44d070a2332041361d3de9e879
   KMPNativeCoroutinesCore: 1c7e0b947f0246c983a7745eba3033e9a577ba9f
   shared: 84b3d75e1d2054a3be1ad65280f7d4a650338826
+  SwiftUIRefresh: ca6ae2718d25aad5dd68bbf5d2ae36ef6ade98bf
 
-PODFILE CHECKSUM: 8ef5b5022d1fb3118a0ad9fbfe63634f454dd146
+PODFILE CHECKSUM: 6049625de9e0875baf3c823a62beebff37ad9182
 
 COCOAPODS: 1.10.1
